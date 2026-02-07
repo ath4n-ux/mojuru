@@ -1,6 +1,6 @@
-// HiAnime.bz Plugin for Mojuru iOS
-// Base URL for the site
-const BASE_URL = 'https://hianime.bz';
+// HiAnime Plugin for Mojuru iOS
+// Base URL for the site (supports both .to and .bz)
+const BASE_URL = 'https://hianime.to';
 
 /**
  * Helper function to extract text between two strings
@@ -46,7 +46,8 @@ function decodeHTML(html) {
     .replace(/&gt;/g, '>')
     .replace(/&quot;/g, '"')
     .replace(/&#039;/g, "'")
-    .replace(/&#39;/g, "'");
+    .replace(/&#39;/g, "'")
+    .replace(/&#x27;/g, "'");
 }
 
 /**
@@ -58,47 +59,58 @@ async function search(query) {
   try {
     const searchUrl = `${BASE_URL}/search?keyword=${encodeURIComponent(query)}`;
     const response = await fetch(searchUrl);
-    const html = await response.text();
     
+    if (!response.ok) {
+      console.error('Search failed:', response.status);
+      return [];
+    }
+    
+    const html = await response.text();
     const results = [];
     
-    // Extract anime items using regex patterns (no DOM parser needed)
-    const itemPattern = /<div[^>]*class="[^"]*flw-item[^"]*"[^>]*>[\s\S]*?<\/div>\s*<\/div>\s*<\/div>/g;
-    const items = html.match(itemPattern) || [];
+    // Method 1: Look for film poster divs (most common structure)
+    const posterPattern = /<div[^>]*class="[^"]*film-poster[^"]*"[^>]*>[\s\S]*?<a[^>]*href="([^"]*)"[^>]*>[\s\S]*?<img[^>]*data-src="([^"]*)"[^>]*alt="([^"]*)"[^>]*>[\s\S]*?<\/div>/g;
+    let match;
     
-    items.forEach(itemHtml => {
-      try {
-        // Extract href
-        const hrefMatch = itemHtml.match(/href="([^"]*(?:\/watch\/|\/detail\/)[^"]*)"/);
-        if (!hrefMatch) return;
-        
-        const href = hrefMatch[1];
-        const id = href.split('/').filter(Boolean).pop();
-        
-        // Extract title
-        const titleMatch = itemHtml.match(/data-jname="([^"]*)"|class="film-name[^>]*>(?:<a[^>]*>)?([^<]+)/);
-        const title = titleMatch ? decodeHTML(titleMatch[1] || titleMatch[2] || '').trim() : '';
-        
-        // Extract image
-        const imgMatch = itemHtml.match(/data-src="([^"]*)"|src="([^"]*\/uploads\/[^"]*)"/);
-        const image = imgMatch ? (imgMatch[1] || imgMatch[2] || '') : '';
+    while ((match = posterPattern.exec(html)) !== null) {
+      const href = match[1];
+      const image = match[2];
+      const title = decodeHTML(match[3]);
+      const id = href.split('/').filter(Boolean).pop();
+      
+      if (id && title) {
+        results.push({
+          id: id,
+          title: title,
+          image: image || '',
+          url: `${BASE_URL}${href}`
+        });
+      }
+    }
+    
+    // Method 2: Fallback - simple link pattern
+    if (results.length === 0) {
+      const linkPattern = /<a[^>]*href="\/watch\/([^"?]+)[^"]*"[^>]*title="([^"]*)"[^>]*>/g;
+      
+      while ((match = linkPattern.exec(html)) !== null) {
+        const id = match[1];
+        const title = decodeHTML(match[2]);
         
         if (id && title) {
           results.push({
             id: id,
             title: title,
-            image: image,
-            url: `${BASE_URL}${href}`
+            image: '',
+            url: `${BASE_URL}/watch/${id}`
           });
         }
-      } catch (e) {
-        console.error('Error parsing item:', e);
       }
-    });
+    }
     
+    console.log('Search found', results.length, 'results for:', query);
     return results;
   } catch (error) {
-    console.error('Search error:', error);
+    console.error('Search error:', error.message || error);
     return [];
   }
 }
