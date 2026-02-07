@@ -4,7 +4,7 @@
   "pluginType": "provider",
   "pluginProvider": "Standard",
   "contentProvider": "HiAnime",
-  "scriptUrl": "REPLACE_WITH_YOUR_GITHUB_RAW_URL_OR_HOSTING_URL",
+  "scriptUrl": "https://raw.githubusercontent.com/ath4n-ux/mojuru/refs/heads/main/hianime-plugin.js",
   "iconUrl": "https://hianime.bz/favicon.ico",
   "author": {
     "name": "Custom Plugin",
