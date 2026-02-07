@@ -1,0 +1,19 @@
+{
+  "name": "HiAnime",
+  "compatible": true,
+  "pluginType": "provider",
+  "pluginProvider": "Standard",
+  "contentProvider": "HiAnime",
+  "scriptUrl": "REPLACE_WITH_YOUR_GITHUB_RAW_URL_OR_HOSTING_URL",
+  "iconUrl": "https://hianime.bz/favicon.ico",
+  "author": {
+    "name": "Custom Plugin",
+    "icon": "https://hianime.bz/favicon.ico"
+  },
+  "version": "1.0.0",
+  "language": "English",
+  "streamType": "HLS",
+  "quality": "1080p",
+  "baseUrl": "https://hianime.bz",
+  "type": "anime"
+}
