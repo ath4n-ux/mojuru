@@ -5,15 +5,15 @@
   "pluginProvider": "Standard",
   "contentProvider": "HiAnime",
   "scriptUrl": "https://raw.githubusercontent.com/ath4n-ux/mojuru/refs/heads/main/hianime-plugin.js",
-  "iconUrl": "https://hianime.bz/favicon.ico",
+  "iconUrl": "https://hianime.to/images/logo.png",
   "author": {
     "name": "Custom Plugin",
-    "icon": "https://hianime.bz/favicon.ico"
+    "icon": "https://hianime.to/images/logo.png"
   },
-  "version": "1.0.0",
+  "version": "1.0.2",
   "language": "English",
   "streamType": "HLS",
   "quality": "1080p",
-  "baseUrl": "https://hianime.bz",
+  "baseUrl": "https://hianime.to",
   "type": "anime"
 }
